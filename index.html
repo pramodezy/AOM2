@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Date Difference Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --text: #2b2d42;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+      --border-radius: 12px;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      color: var(--text);
+    }
+    
+    .container {
+      background: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      width: 100%;
+      max-width: 650px;
+      padding: 2rem;
+      transition: var(--transition);
+    }
+    
+    h1 {
+      color: var(--primary);
+      margin-bottom: 1rem;
+      font-weight: 600;
+      text-align: center;
+      font-size: 1.8rem;
+    }
+    
+    .description {
+      color: var(--text);
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
+      text-align: center;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 1.5rem;
+      border-bottom: 2px solid #e9ecef;
+    }
+    
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      color: #6c757d;
+      transition: var(--transition);
+      border-bottom: 3px solid transparent;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .input-row {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .input-row > div {
+      flex: 1;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--primary);
+      font-size: 0.9rem;
+    }
+    
+    .date-input {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .date-input input {
+      width: 100%;
+      padding: 0.8rem;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      outline: none;
+      position: relative;
+      z-index: 5;
+    }
+    
+    .date-input input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+    }
+    
+    .date-input select {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: none;
+      background: transparent;
+      font-size: 0.9rem;
+      color: var(--text);
+      outline: none;
+      cursor: pointer;
+      z-index: 10;
+      appearance: none;
+      -webkit-appearance: none;
+      padding-right: 1.5rem;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.5rem center;
+      background-size: 1rem;
+    }
+    
+    .date-input input[type="date"]::-webkit-calendar-picker-indicator {
+      position: relative;
+      z-index: 20;
+    }
+    
+    .result-container {
+      background: linear-gradient(135deg, #4361ee 0%, #3f37c9 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      text-align: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: var(--transition);
+      margin-top: 1rem;
+    }
+    
+    .result-container.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    
+    .result-title {
+      font-size: 1rem;
+      margin-bottom: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .result {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      line-height: 1.4;
+    }
+    
+    .highlight {
+      color: #f72585;
+      background: white;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin: 0.2rem;
+    }
+    
+    .date-display {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      margin-top: 0.8rem;
+      line-height: 1.5;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: var(--text);
+      opacity: 0.7;
+    }
+    
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .result {
+        font-size: 1.3rem;
+      }
+      
+      .input-row {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .tabs {
+        justify-content: center;
+      }
+      
+      .tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="far fa-calendar-alt"></i> Age-o-Meter</h1>
+    <p class="description">Discover exactly how much time has passed since any important date in your life - birthdays, anniversaries, or special events. Choose between single date or date range calculation.</p>
+    
+    <div class="tabs">
+      <div class="tab active" data-tab="single">Since Date</div>
+      <div class="tab" data-tab="range">Between Dates</div>
+    </div>
+    
+    <div class="tab-content active" id="single-tab">
+      <div class="input-group">
+        <label for="startDate">Select a Date</label>
+        <div class="date-input">
+          <input type="date" id="startDate">
+          <select id="yearSelect"></select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="range-tab">
+      <div class="input-group">
+        <div class="input-row">
+          <div>
+            <label for="fromDate">From Date</label>
+            <div class="date-input">
+              <input type="date" id="fromDate">
+              <select id="fromYearSelect"></select>
+            </div>
+          </div>
+          <div>
+            <label for="toDate">To Date</label>
+            <div class="date-input">
+              <input type="date" id="toDate">
+              <select id="toYearSelect"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="result-container" id="outputContainer">
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result" id="output"></div>
+      <div class="date-display" id="dateDisplay"></div>
+    </div>
+    
+    <div class="footer">
+      Made with <i class="fas fa-heart" style="color: #f72585;"></i> for precise date calculations
+    </div>
+  </div>
+
+  <script>
+    // DOM Elements
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const outputContainer = document.getElementById('outputContainer');
+    const resultTitle = document.getElementById('resultTitle');
+    const output = document.getElementById('output');
+    const dateDisplay = document.getElementById('dateDisplay');
+    
+    // Current date elements
+    const startDateInput = document.getElementById('startDate');
+    const yearSelect = document.getElementById('yearSelect');
+    
+    // Range date elements
+    const fromDateInput = document.getElementById('fromDate');
+    const toDateInput = document.getElementById('toDate');
+    const fromYearSelect = document.getElementById('fromYearSelect');
+    const toYearSelect = document.getElementById('toYearSelect');
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set max date to today for all date inputs
+      const today = new Date().toISOString().split('T')[0];
+      startDateInput.max = today;
+      fromDateInput.max = today;
+      toDateInput.max = today;
+      
+      // Initialize year dropdowns
+      initYearDropdown(yearSelect, 100);
+      initYearDropdown(fromYearSelect, 100);
+      initYearDropdown(toYearSelect, 100);
+      
+      // Set current year as default
+      const currentYear = new Date().getFullYear();
+      yearSelect.value = currentYear;
+      fromYearSelect.value = currentYear - 1;
+      toYearSelect.value = currentYear;
+      
+      // Set default dates
+      setDateFromYear(startDateInput, currentYear);
+      setDateFromYear(fromDateInput, currentYear - 1);
+      setDateFromYear(toDateInput, currentYear);
+      
+      // Add event listeners
+      startDateInput.addEventListener('change', calculateSingleDate);
+      yearSelect.addEventListener('change', function() {
+        setDateFromYear(startDateInput, this.value);
+        calculateSingleDate();
+      });
+      
+      fromDateInput.addEventListener('change', calculateDateRange);
+      toDateInput.addEventListener('change', calculateDateRange);
+      fromYearSelect.addEventListener('change', function() {
+        setDateFromYear(fromDateInput, this.value);
+        calculateDateRange();
+      });
+      toYearSelect.addEventListener('change', function() {
+        setDateFromYear(toDateInput, this.value);
+        calculateDateRange();
+      });
+      
+      // Tab switching
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+          
+          this.classList.add('active');
+          document.getElementById(`${this.dataset.tab}-tab`).classList.add('active');
+          
+          // Recalculate based on active tab
+          if (this.dataset.tab === 'single') {
+            calculateSingleDate();
+          } else {
+            calculateDateRange();
+          }
+        });
+      });
+    });
+    
+    // Initialize year dropdown
+    function initYearDropdown(selectElement, yearsBack) {
+      const currentYear = new Date().getFullYear();
+      selectElement.innerHTML = '';
+      
+      // Add a default empty option
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = 'Year';
+      defaultOption.hidden = true;
+      selectElement.appendChild(defaultOption);
+      
+      for (let year = currentYear; year >= currentYear - yearsBack; year--) {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        selectElement.appendChild(option);
+      }
+      
+      // Add click event to stop propagation
+      selectElement.addEventListener('click', function(e) {
+        e.stopPropagation();
+      });
+    }
+    
+    // Set date based on selected year (keeping month/day the same)
+    function setDateFromYear(dateInput, year) {
+      const currentDate = dateInput.value ? new Date(dateInput.value) : new Date();
+      currentDate.setFullYear(year);
+      dateInput.value = currentDate.toISOString().split('T')[0];
+    }
+    
+    // Calculate time since single date
+    function calculateSingleDate() {
+      const inputDate = new Date(startDateInput.value);
+      const today = new Date();
+      
+      if (isNaN(inputDate)) {
+        showError("Please select a valid date");
+        return;
+      }
+      
+      const diff = calculateDateDifference(inputDate, today);
+      
+      if (diff.totalDays === 0) {
+        output.innerHTML = "Less than a day has passed!";
+      } else {
+        output.innerHTML = formatTimeDifference(diff);
+      }
+      
+      resultTitle.textContent = "Time Passed:";
+      dateDisplay.innerHTML = `Since <strong>${formatDate(inputDate)}</strong>`;
+      outputContainer.classList.add('visible');
+    }
+    
+    // Calculate time between two dates
+    function calculateDateRange() {
+      const fromDate = new Date(fromDateInput.value);
+      const toDate = new Date(toDateInput.value);
+      
+      if (isNaN(fromDate) || isNaN(toDate)) {
+        showError("Please select valid dates");
+        return;
+      }
+      
+      if (fromDate > toDate) {
+        showError("From date must be before To date");
+        return;
+      }
+      
+      const diff = calculateDateDifference(fromDate, toDate);
+      output.innerHTML = formatTimeDifference(diff);
+      
+      resultTitle.textContent = "Time Between Dates:";
+      dateDisplay.innerHTML = `From <strong>${formatDate(fromDate)}</strong> to <strong>${formatDate(toDate)}</strong>`;
+      outputContainer.classList.add('visible');
+    }
+    
+    // Calculate difference between two dates
+    function calculateDateDifference(startDate, endDate) {
+      let years = endDate.getFullYear() - startDate.getFullYear();
+      let months = endDate.getMonth() - startDate.getMonth();
+      let days = endDate.getDate() - startDate.getDate();
+      
+      if (days < 0) {
+        months--;
+        const prevMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 0);
+        days += prevMonth.getDate();
+      }
+      
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      
+      // Calculate total days for accurate comparison
+      const timeDiff = endDate - startDate;
+      const totalDays = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      
+      return { years, months, days, totalDays };
+    }
+    
+    // Format the time difference for display
+    function formatTimeDifference(diff) {
+      const { years, months, days } = diff;
+      
+      const yearText = years > 0 ? `<span class="highlight">${years}</span> year${years !== 1 ? 's' : ''}` : '';
+      const monthText = months > 0 ? `<span class="highlight">${months}</span> month${months !== 1 ? 's' : ''}` : '';
+      const dayText = days > 0 ? `<span class="highlight">${days}</span> day${days !== 1 ? 's' : ''}` : '';
+      
+      let timeParts = [];
+      if (years > 0) timeParts.push(yearText);
+      if (months > 0) timeParts.push(monthText);
+      if (days > 0) timeParts.push(dayText);
+      
+      if (timeParts.length === 0) return "The dates are the same";
+      
+      let timeString = timeParts.join(', ');
+      const lastComma = timeString.lastIndexOf(',');
+      if (lastComma > -1) {
+        timeString = timeString.substring(0, lastComma) + ' and' + timeString.substring(lastComma + 1);
+      }
+      
+      return timeString;
+    }
+    
+    // Format date for display
+    function formatDate(date) {
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    }
+    
+    // Show error message
+    function showError(message) {
+      output.textContent = message;
+      resultTitle.textContent = "";
+      dateDisplay.textContent = "";
+      outputContainer.classList.add('visible');
+    }
+  </script>
+</body>
+</html>
